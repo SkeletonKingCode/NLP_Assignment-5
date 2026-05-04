@@ -196,7 +196,7 @@ No changes were made to the core chatbot system. The evaluation suite is a pure 
 
 ## Video Demo
 
-**[YouTube Link]** — *(Upload your 5-minute demo as unlisted and paste the link here)*
+**[YouTube Link]** — [Youtube](https://youtu.be)
 
 The video demonstrates:
 1. Running the automated evaluation suite
