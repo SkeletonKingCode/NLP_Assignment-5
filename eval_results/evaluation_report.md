@@ -1,6 +1,6 @@
 # Ali Real Estate Chatbot — Evaluation Report
 
-**Generated:** 2026-05-04 23:51:44
+**Generated:** 2026-05-05 01:03:57
 **Platform:** Linux-6.17.0-23-generic-x86_64-with-glibc2.39
 
 ## 1. Hardware Configuration
@@ -11,7 +11,8 @@
 | CPU Cores | 8 |
 | RAM | 31.2 GB |
 | GPU | NVIDIA GeForce GTX 1050 (4096 MiB, driver 580.142) |
-| Disk (Total/Free) | 467.3/386.8 GB |
+| Disk (Used/Total) | 80.5/467.3 GB |
+| Disk (Free/Total) | 386.8/467.3 GB |
 | Python | 3.11.14 |
 
 ## 2. Dependency Versions
@@ -79,14 +80,25 @@
 
 | Scenario | Trials | TTFT Mean | TTFT Median | TTFT P90 | E2E Mean | E2E Median | E2E P90 |
 |----------|--------|-----------|-------------|----------|----------|------------|---------|
-| Simple Dialogue | 30 | 2.642s | 2.082s | 2.516s | 7.241s | 6.237s | 13.001s |
-| RAG Only | — | — | — | — | — | — | — |
-| Tool Only | — | — | — | — | — | — | — |
-| Mixed (RAG + Tool) | — | — | — | — | — | — | — |
+| Simple Dialogue | 30 | 2.551s | 1.940s | 2.363s | 7.055s | 5.940s | 12.707s |
+| RAG Only | 30 | 2.297s | 2.409s | 2.427s | 14.884s | 14.124s | 24.953s |
+| Tool Only | 30 | 2.085s | 2.080s | 2.111s | 12.608s | 10.377s | 21.417s |
+| Mixed (RAG + Tool) | 30 | 2.315s | 2.418s | 2.448s | 17.051s | 16.502s | 29.646s |
 
 ## 7. Performance — Throughput
 
-*(Run throughput tests to populate)*
+- **Max Sustainable Concurrency:** 0 users
+- **Breakpoint:** 1 users
+- **Thresholds:** TTFT < 2.0s, E2E < 10.0s
+
+| Users | Turns | Time (s) | Turns/sec | Errors | Med TTFT | Med E2E | Within |
+|-------|-------|----------|-----------|--------|----------|---------|--------|
+| 1 | 3 | 30.5 | 0.10 | 0 | 3.136s | 11.657s | ✗ |
+| 2 | 6 | 71.4 | 0.08 | 0 | 11.968s | 19.125s | ✗ |
+| 3 | 9 | 125.1 | 0.07 | 0 | 19.242s | 27.125s | ✗ |
+| 5 | 15 | 160.8 | 0.09 | 0 | 41.413s | 48.373s | ✗ |
+| 8 | 24 | 260.0 | 0.09 | 0 | 68.626s | 74.021s | ✗ |
+| 10 | 30 | 325.9 | 0.09 | 0 | 79.290s | 83.929s | ✗ |
 
 ## 8. Test Failures and Errors
 

@@ -229,7 +229,8 @@ def generate_report():
     report_lines.append(f"| CPU Cores | {hw_info.get('cpu_cores', 'Unknown')} |")
     report_lines.append(f"| RAM | {hw_info.get('ram_gb', 'Unknown')} GB |")
     report_lines.append(f"| GPU | {hw_info.get('gpu', 'Not detected')} |")
-    report_lines.append(f"| Disk (Total/Free) | {hw_info.get('disk_total_gb', '?')}/{hw_info.get('disk_free_gb', '?')} GB |")
+    report_lines.append(f"| Disk (Used/Total) | {hw_info.get('disk_total_gb', '?')-hw_info.get('disk_free_gb', '?')}/{hw_info.get('disk_total_gb', '?')} GB |")
+    report_lines.append(f"| Disk (Free/Total) | {hw_info.get('disk_free_gb', '?')}/{hw_info.get('disk_total_gb', '?')} GB |")
     report_lines.append(f"| Python | {hw_info['python_version']} |")
     report_lines.append("")
 
