@@ -1,0 +1,238 @@
+{
+  "_description": "10+ multi-turn test dialogues covering typical user intents, edge cases, and policy violations for the Ali Real Estate chatbot. Each dialogue has an expected outcome or rubric.",
+  "dialogues": [
+    {
+      "id": "conv_01_happy_path_house",
+      "title": "Happy Path — House Purchase Flow",
+      "description": "User follows the full greeting → category → subtype → closing flow for a house.",
+      "turns": [
+        {"role": "user", "content": "Hello, I am looking for a property."},
+        {"role": "expected", "content_contains": ["welcome", "category", "Shops", "Houses", "Apartments"], "stage_after": "greeting"},
+        {"role": "user", "content": "I want to see houses."},
+        {"role": "expected", "content_contains": ["5 Marla", "7 Marla", "10 Marla", "1 Kanal", "PKR"], "stage_after": "category_selection"},
+        {"role": "user", "content": "I like the 10 marla house."},
+        {"role": "expected", "content_contains": ["PKR 4.2 Crore", "10 Marla"], "stage_after": "subtype_selection"},
+        {"role": "user", "content": "I would like to schedule a visit."},
+        {"role": "expected", "content_contains": ["visit", "schedule"], "stage_after": "closing"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "final_stage": "closing",
+        "selected_category": "Houses/Villas",
+        "selected_subtype": "10 Marla House",
+        "selected_price": "PKR 4.2 Crore"
+      }
+    },
+    {
+      "id": "conv_02_happy_path_shop",
+      "title": "Happy Path — Shop Purchase Flow",
+      "description": "User selects a shop category and picks 8 Marla.",
+      "turns": [
+        {"role": "user", "content": "Hi there!"},
+        {"role": "expected", "content_contains": ["welcome", "category"], "stage_after": "greeting"},
+        {"role": "user", "content": "Show me your shops."},
+        {"role": "expected", "content_contains": ["5 Marla", "8 Marla", "1 Kanal", "PKR"], "stage_after": "category_selection"},
+        {"role": "user", "content": "I want the 8 marla shop."},
+        {"role": "expected", "content_contains": ["PKR 2.1 Crore", "8 Marla"], "stage_after": "subtype_selection"},
+        {"role": "user", "content": "Please book a visit for me."},
+        {"role": "expected", "content_contains": ["visit", "book"], "stage_after": "closing"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "final_stage": "closing",
+        "selected_category": "Shops",
+        "selected_subtype": "8 Marla Shop",
+        "selected_price": "PKR 2.1 Crore"
+      }
+    },
+    {
+      "id": "conv_03_happy_path_apartment",
+      "title": "Happy Path — Apartment Purchase Flow",
+      "description": "User selects apartments and picks a 2 bedroom.",
+      "turns": [
+        {"role": "user", "content": "Hello, what properties do you have?"},
+        {"role": "expected", "content_contains": ["category"], "stage_after": "greeting"},
+        {"role": "user", "content": "I am interested in an apartment."},
+        {"role": "expected", "content_contains": ["1 Bedroom", "2 Bedroom", "3 Bedroom", "PKR"], "stage_after": "category_selection"},
+        {"role": "user", "content": "The 2 bedroom apartment sounds good."},
+        {"role": "expected", "content_contains": ["PKR 95 Lac"], "stage_after": "subtype_selection"},
+        {"role": "user", "content": "I'd like to speak to an agent."},
+        {"role": "expected", "content_contains": ["agent"], "stage_after": "closing"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "final_stage": "closing",
+        "selected_category": "Apartments",
+        "selected_subtype": "2 Bedroom Apt",
+        "selected_price": "PKR 95 Lac"
+      }
+    },
+    {
+      "id": "conv_04_off_topic_rejection",
+      "title": "Policy Adherence — Off-Topic Rejection",
+      "description": "User asks about topics completely outside real estate. The bot should politely decline.",
+      "turns": [
+        {"role": "user", "content": "Hello!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "Can you write me a Python script to scrape a website?"},
+        {"role": "expected", "must_refuse": true, "content_contains": ["real estate", "property", "can't", "sorry", "cannot", "outside"], "stage_after": "greeting"},
+        {"role": "user", "content": "Tell me about the latest cricket match results."},
+        {"role": "expected", "must_refuse": true, "content_contains": ["real estate", "property", "help", "sorry"], "stage_after": "greeting"}
+      ],
+      "expected_outcome": {
+        "task_completed": false,
+        "policy_adhered": true,
+        "notes": "Bot must refuse non-real-estate requests"
+      }
+    },
+    {
+      "id": "conv_05_weather_tool",
+      "title": "Tool Invocation — Weather Query",
+      "description": "User asks about weather, which should trigger the weather tool.",
+      "turns": [
+        {"role": "user", "content": "Hello Ali!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "What is the weather like in Lahore today?"},
+        {"role": "expected", "tool_expected": "get_weather", "tool_args": {"city": "Lahore"}, "stage_after": "greeting"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "tool_used": "get_weather"
+      }
+    },
+    {
+      "id": "conv_06_calculator_tool",
+      "title": "Tool Invocation — Calculator",
+      "description": "User asks for a math calculation during property discussion.",
+      "turns": [
+        {"role": "user", "content": "Hi, I need help with some numbers."},
+        {"role": "expected", "content_contains": ["help"], "stage_after": "greeting"},
+        {"role": "user", "content": "Can you calculate 50 * 1.2 / 2 for me?"},
+        {"role": "expected", "tool_expected": "calculate", "tool_args": {"expression": "50 * 1.2 / 2"}, "stage_after": "greeting"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "tool_used": "calculate"
+      }
+    },
+    {
+      "id": "conv_07_calendar_tool",
+      "title": "Tool Invocation — Calendar Scheduling",
+      "description": "User asks to schedule a property visit event.",
+      "turns": [
+        {"role": "user", "content": "Hello!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "I want to see houses."},
+        {"role": "expected", "content_contains": ["Marla", "PKR"], "stage_after": "category_selection"},
+        {"role": "user", "content": "Schedule a property visit for May 15th 2026 at DHA Phase 6."},
+        {"role": "expected", "tool_expected": "add_event", "stage_after": "category_selection"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "tool_used": "add_event"
+      }
+    },
+    {
+      "id": "conv_08_crm_update",
+      "title": "Tool Invocation — CRM Update",
+      "description": "User provides personal info that should trigger CRM update.",
+      "turns": [
+        {"role": "user", "content": "Hi Ali!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "Update my budget to 2 Crore."},
+        {"role": "expected", "tool_expected": "update_user_info", "tool_args": {"field": "budget", "value": "2 Crore"}, "stage_after": "greeting"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "tool_used": "update_user_info"
+      }
+    },
+    {
+      "id": "conv_09_consistency_check",
+      "title": "Coherence — Multi-Turn Memory",
+      "description": "Verifies the bot remembers earlier choices and does not contradict itself.",
+      "turns": [
+        {"role": "user", "content": "Hello!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "I want to see houses."},
+        {"role": "expected", "content_contains": ["House", "Marla"], "stage_after": "category_selection"},
+        {"role": "user", "content": "Tell me about the 7 marla house."},
+        {"role": "expected", "content_contains": ["PKR 2.6 Crore", "7 Marla"], "stage_after": "subtype_selection"},
+        {"role": "user", "content": "What property did I select?"},
+        {"role": "expected", "content_contains": ["7 Marla"], "must_not_contain": ["5 Marla House", "10 Marla House"], "stage_after": "subtype_selection"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "coherence_required": true
+      }
+    },
+    {
+      "id": "conv_10_unavailable_property",
+      "title": "Edge Case — Unavailable Property Size",
+      "description": "User asks for a property size not in inventory. Bot must say it is unavailable.",
+      "turns": [
+        {"role": "user", "content": "Hello, I want houses."},
+        {"role": "expected", "content_contains": ["House", "Marla"], "stage_after": "category_selection"},
+        {"role": "user", "content": "Do you have a 20 marla house?"},
+        {"role": "expected", "content_contains": ["unavailable", "don't", "not", "available"], "stage_after": "category_selection"}
+      ],
+      "expected_outcome": {
+        "task_completed": false,
+        "policy_adhered": true,
+        "notes": "Bot must indicate this size is not available"
+      }
+    },
+    {
+      "id": "conv_11_rag_query",
+      "title": "RAG — Document-Grounded Question",
+      "description": "User asks about DHA Phase 6 details. Bot should retrieve RAG context.",
+      "turns": [
+        {"role": "user", "content": "Hello!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "Tell me about DHA Phase 6 residential features."},
+        {"role": "expected", "content_contains": ["DHA", "Phase 6"], "rag_required": true, "stage_after": "greeting"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "rag_used": true
+      }
+    },
+    {
+      "id": "conv_12_mixed_rag_and_tool",
+      "title": "Mixed — RAG + Tool in Same Conversation",
+      "description": "User asks RAG question then uses a tool in same conversation.",
+      "turns": [
+        {"role": "user", "content": "Hello!"},
+        {"role": "expected", "content_contains": ["welcome"], "stage_after": "greeting"},
+        {"role": "user", "content": "What is the tax process for buying property in Pakistan?"},
+        {"role": "expected", "content_contains": ["tax", "CVT", "stamp", "FBR"], "rag_required": true, "stage_after": "greeting"},
+        {"role": "user", "content": "Calculate 2% of 4.2 crore for me."},
+        {"role": "expected", "tool_expected": "calculate", "stage_after": "greeting"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "rag_used": true,
+        "tool_used": "calculate"
+      }
+    },
+    {
+      "id": "conv_13_kanal_villa",
+      "title": "Happy Path — 1 Kanal Villa Selection",
+      "description": "User picks the premium villa option.",
+      "turns": [
+        {"role": "user", "content": "Hi, I want something luxurious."},
+        {"role": "expected", "content_contains": ["category"], "stage_after": "greeting"},
+        {"role": "user", "content": "Show me houses and villas."},
+        {"role": "expected", "content_contains": ["5 Marla", "1 Kanal", "PKR"], "stage_after": "category_selection"},
+        {"role": "user", "content": "I want the 1 kanal villa."},
+        {"role": "expected", "content_contains": ["PKR 8.5 Crore", "1 Kanal"], "stage_after": "subtype_selection"}
+      ],
+      "expected_outcome": {
+        "task_completed": true,
+        "final_stage": "subtype_selection",
+        "selected_subtype": "1 Kanal Villa",
+        "selected_price": "PKR 8.5 Crore"
+      }
+    }
+  ]
+}

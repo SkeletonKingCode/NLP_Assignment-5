@@ -1,0 +1,185 @@
+{
+  "_description": "30 queries with manually annotated relevant document sources for RAG retrieval evaluation. Each query maps to the document filenames (sources) that contain the answer.",
+  "queries": [
+    {
+      "id": "rag_01",
+      "query": "Tell me about DHA Phase 1 residential plots",
+      "relevant_sources": ["real_estate_doc_1.txt"],
+      "expected_keywords": ["DHA Phase 1", "Residential Plot Availability", "investors"]
+    },
+    {
+      "id": "rag_02",
+      "query": "What is the commercial investment potential in DHA Phase 2?",
+      "relevant_sources": ["real_estate_doc_2.txt"],
+      "expected_keywords": ["DHA Phase 2", "Commercial Investment Potential"]
+    },
+    {
+      "id": "rag_03",
+      "query": "DHA Phase 5 amenities and infrastructure",
+      "relevant_sources": ["real_estate_doc_5.txt"],
+      "expected_keywords": ["DHA Phase 5", "Amenity", "Infrastructure"]
+    },
+    {
+      "id": "rag_04",
+      "query": "Are there residential plots available in DHA Phase 9 Town?",
+      "relevant_sources": ["real_estate_doc_10.txt"],
+      "expected_keywords": ["DHA Phase 9 Town", "Residential Plot"]
+    },
+    {
+      "id": "rag_05",
+      "query": "DHA Phase 6 residential overview with features",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["DHA Phase 6", "carpeted roads", "security"]
+    },
+    {
+      "id": "rag_06",
+      "query": "Bahria Town Karachi investment and luxury lifestyle",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Bahria Town Karachi", "luxury", "theme park"]
+    },
+    {
+      "id": "rag_07",
+      "query": "What taxes apply to property purchase in Pakistan?",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Capital Value Tax", "Stamp Duty", "FBR", "Withholding Tax"]
+    },
+    {
+      "id": "rag_08",
+      "query": "Property possession and maintenance charges",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Possession", "maintenance", "construction", "solar"]
+    },
+    {
+      "id": "rag_09",
+      "query": "5 marla house features and specifications",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["5 Marla", "3 bedrooms", "car porch"]
+    },
+    {
+      "id": "rag_10",
+      "query": "1 kanal villa details and bedrooms",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["1 Kanal", "5-6 bedrooms", "servant quarters"]
+    },
+    {
+      "id": "rag_11",
+      "query": "commercial shops in central business district",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Commercial Shops", "central business", "footfall"]
+    },
+    {
+      "id": "rag_12",
+      "query": "Bahria Orchard Phase 4 commercial potential",
+      "relevant_sources": ["real_estate_doc_20.txt"],
+      "expected_keywords": ["Bahria Orchard Phase 4", "Commercial Investment"]
+    },
+    {
+      "id": "rag_13",
+      "query": "Park View City development status",
+      "relevant_sources": ["real_estate_doc_30.txt"],
+      "expected_keywords": ["Park View City", "Development Status"]
+    },
+    {
+      "id": "rag_14",
+      "query": "Mid City possession and transfer process",
+      "relevant_sources": ["real_estate_doc_40.txt"],
+      "expected_keywords": ["Mid City", "Possession", "Transfer"]
+    },
+    {
+      "id": "rag_15",
+      "query": "Citi Housing amenities and infrastructure",
+      "relevant_sources": ["real_estate_doc_50.txt"],
+      "expected_keywords": ["Citi Housing", "Amenity", "Infrastructure"]
+    },
+    {
+      "id": "rag_16",
+      "query": "security features in DHA residential phases",
+      "relevant_sources": ["real_estate_doc_1.txt", "real_estate_doc_5.txt", "property_guide.txt"],
+      "expected_keywords": ["security", "24/7", "patrolling"]
+    },
+    {
+      "id": "rag_17",
+      "query": "how to get NDC for property transfer",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["NDC", "No Demand Certificate", "society office"]
+    },
+    {
+      "id": "rag_18",
+      "query": "infrastructure and electricity in housing schemes",
+      "relevant_sources": ["real_estate_doc_1.txt", "real_estate_doc_5.txt", "property_guide.txt"],
+      "expected_keywords": ["infrastructure", "electricity", "gas", "water"]
+    },
+    {
+      "id": "rag_19",
+      "query": "investor documentation requirements",
+      "relevant_sources": ["real_estate_doc_1.txt", "real_estate_doc_2.txt"],
+      "expected_keywords": ["legal documentation", "investors"]
+    },
+    {
+      "id": "rag_20",
+      "query": "Raya Fairways Club location",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Raya Fairways Club", "Phase 6"]
+    },
+    {
+      "id": "rag_21",
+      "query": "gated community with theme park and hospital",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Bahria Town Karachi", "gated community", "theme park", "hospital"]
+    },
+    {
+      "id": "rag_22",
+      "query": "Eiffel Tower and Taj Mahal replica housing society",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Bahria Town Karachi", "Eiffel Tower", "Taj Mahal"]
+    },
+    {
+      "id": "rag_23",
+      "query": "solar panel installation in housing",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["solar panel", "green living"]
+    },
+    {
+      "id": "rag_24",
+      "query": "Filer vs Non-Filer tax difference on property",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Filer", "Non-Filer", "FBR"]
+    },
+    {
+      "id": "rag_25",
+      "query": "stamp duty percentage on property transfer",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["Stamp Duty", "3%"]
+    },
+    {
+      "id": "rag_26",
+      "query": "fiscal year possession timeline for new blocks",
+      "relevant_sources": ["real_estate_doc_1.txt", "real_estate_doc_2.txt", "real_estate_doc_10.txt"],
+      "expected_keywords": ["Possession", "fiscal year", "new blocks"]
+    },
+    {
+      "id": "rag_27",
+      "query": "overseas investors buying property in Pakistan",
+      "relevant_sources": ["real_estate_doc_1.txt", "real_estate_doc_2.txt"],
+      "expected_keywords": ["overseas investors", "local"]
+    },
+    {
+      "id": "rag_28",
+      "query": "schools and hospitals near DHA",
+      "relevant_sources": ["real_estate_doc_1.txt", "real_estate_doc_5.txt", "property_guide.txt"],
+      "expected_keywords": ["schools", "hospitals"]
+    },
+    {
+      "id": "rag_29",
+      "query": "precinct system separating commercial and residential",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["precinct", "commercial", "residential", "Bahria"]
+    },
+    {
+      "id": "rag_30",
+      "query": "garbage collection and horticulture services",
+      "relevant_sources": ["property_guide.txt"],
+      "expected_keywords": ["garbage collection", "horticulture", "maintenance"]
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "_description": "Test sets for LLM tool invocation accuracy. Each entry has a user utterance and the expected tool call (or null for no tool). Used to measure precision and recall of tool calling.",
+  "crm_tests": [
+    {
+      "id": "crm_01",
+      "utterance": "My name is Ahmed and I have a budget of 2 Crore.",
+      "expected_tool": "update_user_info",
+      "expected_args_subset": {"field": "budget", "value": "2 Crore"},
+      "description": "Should trigger CRM update with budget"
+    },
+    {
+      "id": "crm_02",
+      "utterance": "Change my phone number to 03001234567.",
+      "expected_tool": "update_user_info",
+      "expected_args_subset": {"field": "phone"},
+      "description": "Should trigger CRM update with phone number"
+    },
+    {
+      "id": "crm_03",
+      "utterance": "Update my preferred area to DHA Phase 6.",
+      "expected_tool": "update_user_info",
+      "expected_args_subset": {"field": "preferred area"},
+      "description": "Should trigger CRM update with area preference"
+    },
+    {
+      "id": "crm_04",
+      "utterance": "Set my marla preference to 10.",
+      "expected_tool": "update_user_info",
+      "expected_args_subset": {"field": "marla"},
+      "description": "Should trigger CRM update with marla preference"
+    },
+    {
+      "id": "crm_05",
+      "utterance": "What do you know about me?",
+      "expected_tool": "get_user_info",
+      "expected_args_subset": {},
+      "description": "Should trigger CRM read"
+    },
+    {
+      "id": "crm_06",
+      "utterance": "I want to see houses.",
+      "expected_tool": null,
+      "expected_args_subset": {},
+      "description": "Should NOT trigger CRM — false positive check"
+    },
+    {
+      "id": "crm_07",
+      "utterance": "Hello, how are you?",
+      "expected_tool": null,
+      "expected_args_subset": {},
+      "description": "Should NOT trigger CRM — casual greeting"
+    }
+  ],
+  "calculator_tests": [
+    {
+      "id": "calc_01",
+      "utterance": "Calculate 50 * 1.2 / 2 for me.",
+      "expected_tool": "calculate",
+      "expected_args_subset": {"expression": "50 * 1.2 / 2"},
+      "description": "Basic math expression"
+    },
+    {
+      "id": "calc_02",
+      "utterance": "What is 2% of 4.2 crore?",
+      "expected_tool": "calculate",
+      "expected_args_subset": {},
+      "description": "Percentage calculation for tax"
+    },
+    {
+      "id": "calc_03",
+      "utterance": "How much is (150 * 5) / 2?",
+      "expected_tool": "calculate",
+      "expected_args_subset": {},
+      "description": "Parenthetical math"
+    },
+    {
+      "id": "calc_04",
+      "utterance": "I want a 5 marla house.",
+      "expected_tool": null,
+      "expected_args_subset": {},
+      "description": "Should NOT trigger calculator — false positive check"
+    }
+  ],
+  "weather_tests": [
+    {
+      "id": "weather_01",
+      "utterance": "What is the weather in Lahore right now?",
+      "expected_tool": "get_weather",
+      "expected_args_subset": {"city": "Lahore"},
+      "description": "Standard weather query"
+    },
+    {
+      "id": "weather_02",
+      "utterance": "Is it raining in Karachi?",
+      "expected_tool": "get_weather",
+      "expected_args_subset": {"city": "Karachi"},
+      "description": "Implicit weather query"
+    },
+    {
+      "id": "weather_03",
+      "utterance": "What's the temperature in Islamabad?",
+      "expected_tool": "get_weather",
+      "expected_args_subset": {"city": "Islamabad"},
+      "description": "Temperature query"
+    },
+    {
+      "id": "weather_04",
+      "utterance": "Tell me about houses.",
+      "expected_tool": null,
+      "expected_args_subset": {},
+      "description": "Should NOT trigger weather — false positive check"
+    }
+  ],
+  "calendar_tests": [
+    {
+      "id": "cal_01",
+      "utterance": "Schedule a visit to DHA Phase 6 on 2026-05-15.",
+      "expected_tool": "add_event",
+      "expected_args_subset": {"date": "2026-05-15"},
+      "description": "Standard event creation"
+    },
+    {
+      "id": "cal_02",
+      "utterance": "Add a meeting with the client on May 20th, 2026.",
+      "expected_tool": "add_event",
+      "expected_args_subset": {},
+      "description": "Natural language date event"
+    },
+    {
+      "id": "cal_03",
+      "utterance": "What events do I have scheduled?",
+      "expected_tool": "get_events",
+      "expected_args_subset": {},
+      "description": "List all events"
+    },
+    {
+      "id": "cal_04",
+      "utterance": "Show me events for 2026-05-15.",
+      "expected_tool": "get_events",
+      "expected_args_subset": {"date": "2026-05-15"},
+      "description": "Filtered event listing"
+    },
+    {
+      "id": "cal_05",
+      "utterance": "I want the 10 marla house.",
+      "expected_tool": null,
+      "expected_args_subset": {},
+      "description": "Should NOT trigger calendar — false positive check"
+    }
+  ]
+}

@@ -38,6 +38,14 @@ class TestHealthEndpoint:
         assert "active_connections" in data
         assert "timestamp" in data
 
+    def test_health_active_connections_is_integer(self):
+        data = client.get("/health").json()
+        assert isinstance(data["active_connections"], int)
+
+    def test_health_timestamp_is_positive(self):
+        data = client.get("/health").json()
+        assert data["timestamp"] > 0
+
 
 # ── Session Lifecycle ────────────────────────────────────────────────────────
 
@@ -49,6 +57,12 @@ class TestSessionEndpoints:
         data = resp.json()
         assert "session_id" in data
         assert len(data["session_id"]) == 36  # UUID
+
+    def test_create_session_message(self):
+        resp = client.post("/session")
+        data = resp.json()
+        assert "message" in data
+        assert "created" in data["message"].lower() or "success" in data["message"].lower()
 
     def test_get_session(self):
         sid = client.post("/session").json()["session_id"]
@@ -73,6 +87,15 @@ class TestSessionEndpoints:
         resp = client.delete("/session/does-not-exist")
         assert resp.status_code == 404
 
+    def test_session_initial_state(self):
+        sid = client.post("/session").json()["session_id"]
+        data = client.get(f"/session/{sid}").json()
+        assert data["stage"] == "greeting"
+        assert data["selected_category"] is None
+        assert data["selected_subtype"] is None
+        assert data["selected_price"] is None
+        assert data["turn_count"] == 0
+
 
 # ── Root / Frontend ──────────────────────────────────────────────────────────
 
@@ -84,3 +107,22 @@ class TestRootEndpoint:
         # Should serve the HTML file or a JSON fallback
         content_type = resp.headers.get("content-type", "")
         assert "html" in content_type or "json" in content_type
+
+    def test_docs_endpoint(self):
+        resp = client.get("/docs")
+        assert resp.status_code == 200
+
+
+# ── Synth Endpoint (mocked TTS) ─────────────────────────────────────────────
+
+class TestSynthEndpoint:
+
+    def test_synth_empty_text_returns_error(self):
+        resp = client.post("/synth", json={"text": ""})
+        assert resp.status_code in [400, 503]  # 400 if validated, 503 if TTS unavailable
+
+    def test_synth_tts_unavailable(self):
+        """TTS is mocked as unavailable in conftest."""
+        resp = client.post("/synth", json={"text": "Hello world"})
+        # Should return 503 since TTS is stubbed as unavailable
+        assert resp.status_code == 503

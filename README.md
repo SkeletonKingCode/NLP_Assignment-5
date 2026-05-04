@@ -1,167 +1,205 @@
-# Ali Real Estate — Autonomous Agentic Chatbot with Semantic Memory & RAG
+# Ali Real Estate — Evaluation Suite for Autonomous Agentic Chatbot
 
 ## Group Members
 *   **Name:** Wajeeha Mahmood | **ID:** 23i-0105
 *   **Name:** Muhammad Alyun Shah | **ID:** 23i-0022
 *   **Name:** Awais Ali | **ID:** 23i-0080
 
-## Project Overview
-This project is a sophisticated evolution of a conversational AI system, extending the foundations of Assignment 3 into a fully autonomous agentic chatbot. Named **Ali**, the assistant is designed for the Pakistani real estate market, providing a seamless, real-time experience.
+---
 
-The system integrates:
-*   **Retrieval-Augmented Generation (RAG):** Grounding responses in authorized property documents.
-*   **Semantic CRM Memory:** A persistent, typo-tolerant user profile system.
-*   **Autonomous Tool Orchestration:** Dynamic execution of math, weather, and scheduling tools.
-*   **Real-time Streaming:** Token-by-token response delivery via WebSockets.
-*   **Local LLM Engine:** Powered by Ollama for privacy and low-latency offline inference.
+## Overview
 
-## Business Use Case
-In the high-stakes Pakistani real estate market, customers often struggle with inconsistent pricing and information overload. **Ali** solves this by:
-*   **Information Consistency:** Using RAG to ensure every price and plot size comes strictly from authorized agency PDFs.
-*   **Transactional Efficiency:** Automating redundant tasks like currency conversion (math tool), site visit scheduling (calendar tool), and checking local conditions (weather tool).
-*   **Personalized Experience:** Using semantic memory to remember user budgets and preferences across sessions, even if the user provides slightly different wording or typos.
+This repository contains a comprehensive, automated evaluation suite for the **Ali Real Estate Chatbot** (Assignment 4). The suite systematically measures correctness, performance, and scalability across all system components.
 
-## Complete System Architecture
+### What is Evaluated
 
-### Architectural Workflow
-The system follows a modular, asynchronous architecture designed for high concurrency and low latency.
+| Dimension | Components | Metrics |
+|-----------|-----------|---------|
+| **Conversational Correctness** | Full dialogues | Task completion, policy adherence, coherence |
+| **RAG Component** | Retrieval pipeline | Precision@k, Recall@k, context relevance, faithfulness |
+| **CRM Tool** | CRUD operations | Data correctness, persistence, semantic matching |
+| **Calculator Tool** | Math evaluation | Functional correctness, error handling, security |
+| **Weather Tool** | API integration | Valid/invalid inputs, timeout handling |
+| **Calendar Tool** | Event management | CRUD, date filtering, ordering |
+| **Tool Orchestrator** | JSON parsing | Tool call extraction, execution, caching |
+| **Latency** | WebSocket streaming | TTFT, inter-token latency, E2E |
+| **Throughput** | Concurrency | Max users, breakpoint, turns/sec |
 
-```mermaid
-graph TD
-    User((User)) <--> WS[FastAPI WebSocket]
-    WS <--> CM[Conversation Manager]
-    CM --> RAG[RAG Retrieval Module]
-    CM --> CRM[Semantic CRM Memory]
-    CM --> LLM[Ollama LLM Engine]
-    CM <--> TO[Tool Orchestrator]
-    TO --> CALC[Calculator Tool]
-    TO --> WTR[Weather Tool]
-    TO --> CAL[Calendar Tool]
-    RAG --> CDB[(ChromaDB Vector Store)]
-    CRM --> CDB
-    CRM --> SQL[(SQLite DB)]
+---
+
+## Quick Start
+
+### Prerequisites
+
+1. Python 3.10+
+2. The chatbot backend from Assignment 4
+3. Ollama with the `ali-realestate` model (for live tests)
+
+### Installation
+
+```bash
+# Clone and set up
+cd NLP_Assignment-5
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-### Component Breakdown
-*   **Frontend:** Vanilla HTML/JS with WebSocket integration for real-time streaming.
-*   **FastAPI Backend:** Handles WebSocket connections and session lifecycle.
-*   **Conversation Manager:** The central "brain" that manages history, context window trimming, and iterative tool-calling loops.
-*   **Tool Orchestrator:** Parses JSON tool calls from LLM output and executes registered async functions.
-*   **RAG Module:** Uses `SentenceTransformers` and `ChromaDB` for high-speed document retrieval.
-*   **Semantic CRM:** Combines SQLite for persistence with ChromaDB for semantic key matching.
+### Running the Evaluation Suite
 
-## Workflow Explanation
+```bash
+# Run all unit/component tests (NO server needed)
+python run_evals.py --unit
 
-### User Request Lifecycle
-1.  **Ingress:** User sends a message via the frontend WebSocket.
-2.  **Preprocessing:** The Conversation Manager retrieves the user's CRM profile and detects off-topic intent.
-3.  **RAG Retrieval:** The system embeds the query and fetches the top-3 relevant context chunks from ChromaDB.
-4.  **Prompt Assembly:** A dynamic system prompt is built, including identity, inventory, conversation state, RAG context, and tool documentation.
-5.  **Iterative Inference:**
-    *   The LLM streams tokens. If it generates a JSON tool call, the stream is intercepted.
-    *   The **Tool Orchestrator** executes the tool asynchronously.
-    *   The result is appended to the context, and the LLM is asked for a final, natural response.
-6.  **Streaming Delivery:** Final tokens are streamed back to the user via WebSockets.
+# Run full suite (server + Ollama REQUIRED)
+python run_evals.py --all
 
-## RAG Implementation
-The RAG pipeline ensures the chatbot is grounded in factual data.
-*   **Pipeline:** `backend/RAG/indexer.py` (Ingestion) $\rightarrow$ `backend/RAG/retrieval.py` (Query).
-*   **Chunking:** 512-character chunks with a 50-character overlap.
-*   **Embedding Model:** `all-MiniLM-L6-v2` (MiniLM) for a perfect balance of speed and accuracy.
-*   **Vector DB:** ChromaDB (Persistent).
-*   **Retrieval:** Top-3 chunks retrieved using Cosine Similarity.
-*   **Optimization:** Embeddings for frequent queries are cached in memory to skip CPU-heavy encoding turns.
+# Run only performance benchmarks
+python run_evals.py --perf
 
-## CRM / Memory System
-Unlike standard CRMs, Ali's memory is **Semantically Aware**.
-*   **Storage:** SQLite stores the raw JSON data; ChromaDB stores the "key" embeddings for semantic lookup.
-*   **Typo Tolerance:** Using a similarity threshold (0.45), the system recognizes that "mlra size" refers to the existing "marla size" field.
-*   **Paraphrasing:** It understands that "spending limit" is semantically equivalent to "budget".
-*   **Example:**
-    *   *Input:* "Set my mlra to 10."
-    *   *System:* Matches `mlra` $\rightarrow$ `marla`.
-    *   *Result:* Updates the existing `marla` key in SQLite.
+# Run LLM-as-judge evaluation
+python run_evals.py --judge
 
-## Tool Orchestration System
-The system uses a robust, regex-based JSON parser to extract tool calls from the LLM's raw token stream.
+# Generate report from existing results
+python run_evals.py --report-only
 
-### Registered Tools
-| Tool Name | Purpose | Example Arguments |
-| :--- | :--- | :--- |
-| `calculate` | Secure math evaluation using AST. | `{"expression": "(50*1.2)/2"}` |
-| `get_weather` | Real-time weather via `wttr.in`. | `{"city": "Lahore"}` |
-| `add_event` | Persistent calendar scheduling. | `{"date": "2026-05-10", "description": "Visit"}` |
-| `update_user_info`| Update semantic CRM profile. | `{"field": "budget", "value": "2 Crore"}` |
+# Or use pytest directly
+pytest tests/ -v                          # All tests
+pytest tests/test_calculator.py -v        # Single component
+pytest tests/ -k "not TestPerformance" -v # Skip perf tests
+```
 
-## Real-Time Optimization
-*   **Embedding Caching:** Reduces repeated query latency by ~800ms.
-*   **Tool Caching:** Deterministic results (like math) are cached to avoid re-execution.
-*   **Async Concurrency:** Every blocking I/O (DB, API, Model Loading) is offloaded to a thread executor to keep the WebSocket responsive.
-*   **Timing Logs:** Every request outputs `[PERF]` logs indicating the exact duration of RAG and Tool cycles.
+### Configuration (Environment Variables)
 
-## Tech Stack
-| Category | Technology |
-| :--- | :--- |
-| **Backend** | FastAPI, Python 3.10+ |
-| **Frontend** | Vanilla HTML5, CSS3, JavaScript |
-| **LLM Engine** | Ollama (ali-realestate model) |
-| **Vector Database** | ChromaDB |
-| **Database** | SQLite3 |
-| **Embeddings** | Sentence-Transformers (all-MiniLM-L6-v2) |
-| **WebSocket** | Python `WebSockets` / FastAPI |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CHATBOT_BASE_URL` | `http://localhost:8000` | Chatbot REST API base URL |
+| `CHATBOT_WS_URL` | `ws://localhost:8000/ws/chat` | WebSocket endpoint URL |
+| `JUDGE_MODEL` | `ali-realestate` | Ollama model for LLM-as-judge |
+| `PERF_NUM_TRIALS` | `30` | Number of trials per latency scenario |
+| `MAX_TTFT` | `2.0` | Acceptable TTFT threshold (seconds) |
+| `MAX_E2E` | `10.0` | Acceptable E2E threshold (seconds) |
 
-## Folder Structure
+---
+
+## Test Suite Structure
+
 ```text
-NLP_Assignment-3-main/
-├── backend/
-│   ├── api/            # FastAPI WebSocket & REST endpoints
-│   ├── CRM/            # SQLite & Semantic Memory logic
-│   ├── Conversation/   # Manager, stage tracking, & prompt logic
-│   ├── RAG/            # Indexing and Retrieval modules
-│   └── Tools/          # Tool Orchestrator & standalone tool modules
-├── frontend/           # index.html & client-side assets
-├── a3.pdf              # Source document for RAG
-├── Dockerfile          # Containerization for backend
-└── requirements.txt    # Project dependencies
+tests/
+├── conftest.py                        # Shared fixtures, dependency stubs
+├── test_data/
+│   ├── test_conversations.json        # 13 multi-turn dialogue test cases
+│   ├── rag_ground_truth.json          # 30 annotated RAG queries
+│   └── tool_invocation_test_set.json  # Tool call accuracy test sets
+├── test_calculator.py                 # Calculator: 18 tests
+├── test_weather.py                    # Weather: 11 tests
+├── test_calendar.py                   # Calendar: 11 tests
+├── test_crm.py                        # CRM: 13 tests
+├── test_orchestrator.py               # Orchestrator: 18 tests
+├── test_conversation.py               # Conversation manager: 22 tests
+├── test_api.py                        # FastAPI endpoints: 13 tests
+├── test_rag.py                        # RAG metrics: 7 tests
+├── test_conversational_correctness.py # E2E dialogue validation: 5 tests
+├── test_performance.py                # Latency benchmarks: 4 scenarios
+├── test_throughput.py                 # Concurrency sweep: 6 levels
+└── test_llm_judge.py                  # LLM judge: 4 evaluation dimensions
+
+run_evals.py                           # Master runner + report generator
+pyproject.toml                         # Pytest configuration
+eval_results/                          # Generated results directory
+└── evaluation_report.md               # Auto-generated report
 ```
 
-## Setup Instructions
-1.  **Clone the Repository:**
-    ```bash
-    git clone <repo_url>
-    cd NLP_Assignment-3-main
-    ```
-2.  **Environment Setup:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows: venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
-3.  **Run Indexing:**
-    ```bash
-    export PYTHONPATH=$(pwd) # Windows:$env:PYTHONPATH="."
-    python backend/RAG/indexer.py
-    ```
-4.  **Start the Backend:**
-    ```bash
-    python backend/api/main.py
-    ```
-5.  **Access UI:** Open `http://0.0.0.0:8000` in any modern browser.
+---
 
-## Performance Benchmarks
-*   **RAG Retrieval:** ~30ms (Cached) / ~500ms (Cold).
-*   **Tool Execution:** ~1ms (Cached) / ~200ms (External API).
-*   **Pre-Inference Latency:** Typically **< 100ms** for return visitors.
-*   **Streaming:** First token delivered in < 1.5s on local hardware.
+## How Metrics Are Computed
 
-## Known Limitations
-*   **Model Size:** Small 2B models used locally may occasionally hallucinate JSON syntax if the prompt is too long.
-*   **Context Window:** Sliding window limited to 10 turns to maintain speed.
+### RAG Metrics
 
-## Future Improvements
-*   **Reranking:** Adding a Cross-Encoder to the RAG pipeline for better chunk relevance.
-*   **Hybrid Search:** Combining BM25 keyword search with Vector search.
-*   **Multi-Agent:** Splitting "Ali" into specialized sub-agents for Sales and Support.
+| Metric | Formula | Description |
+|--------|---------|-------------|
+| **Precision@k** | `relevant_in_top_k / k` | Fraction of retrieved chunks that are relevant |
+| **Recall@k** | `relevant_in_top_k / total_relevant` | Fraction of relevant docs successfully retrieved |
+| **Context Relevance** | `useful_chunks / total_chunks` | Proportion of chunks containing expected keywords |
+| **Faithfulness** | `matched_keywords / expected_keywords` | Keyword overlap between context and ground truth |
 
-## Conclusion
-This system demonstrates a production-ready implementation of an **Autonomous Agent**. By combining the factual grounding of RAG with the semantic intelligence of a custom CRM and the functional power of dynamic tool calling, Ali provides a glimpse into the future of automated real estate services in Pakistan.
+Relevance is determined by checking if retrieved chunks contain content from annotated source documents or expected keywords from `rag_ground_truth.json`.
+
+### Latency Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **TTFT** | Time from sending message to receiving first token (via WebSocket) |
+| **ITL** | Average time between consecutive tokens |
+| **E2E** | Time from sending message to receiving last token |
+
+Each metric reports **mean, median, P90, P99** across 30+ trials per scenario.
+
+### Throughput Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Max Sustainable Concurrency** | Highest concurrent users where median TTFT < 2s AND median E2E < 10s |
+| **Breakpoint** | Concurrency level where latency exceeds thresholds |
+| **Turns/sec** | Total turns completed per second at sustainable concurrency |
+
+### LLM-as-Judge Metrics
+
+The judge LLM evaluates using structured rubrics and scores on a 0–1 scale:
+
+| Metric | What It Measures |
+|--------|-----------------|
+| **Task Completion** | Did the bot fulfil the user's request? |
+| **Policy Adherence** | Did the bot refuse off-topic requests appropriately? |
+| **Coherence** | Does the bot remember context and avoid contradictions? |
+| **Faithfulness** | Is the answer grounded in retrieved documents? |
+
+---
+
+## Interpreting Results
+
+### What is "Good" Performance?
+
+| Metric | Good | Acceptable | Poor |
+|--------|------|------------|------|
+| Precision@3 | > 0.7 | 0.4–0.7 | < 0.4 |
+| Recall@3 | > 0.6 | 0.3–0.6 | < 0.3 |
+| Context Relevance | > 0.7 | 0.4–0.7 | < 0.4 |
+| Faithfulness | > 0.8 | 0.5–0.8 | < 0.5 |
+| Task Completion (judge) | > 0.8 | 0.5–0.8 | < 0.5 |
+| TTFT (simple) | < 1.0s | 1.0–2.0s | > 2.0s |
+| E2E (simple) | < 5.0s | 5.0–10.0s | > 10.0s |
+| Sustainable concurrency | > 5 users | 2–5 users | < 2 users |
+
+---
+
+## Assumptions and Limitations
+
+1. **Model limitations:** The `ali-realestate` model (2B parameters) may hallucinate JSON syntax in long prompts, affecting tool call accuracy.
+2. **Hardware dependency:** All performance metrics are hardware-specific. Results will vary on different machines.
+3. **External APIs:** Weather tool tests depend on `wttr.in` availability. Mocked in unit tests.
+4. **LLM Judge bias:** The judge uses the same model family; ideally a larger/different model should be used. Validation against human judgment recommended.
+5. **RAG index required:** RAG evaluation tests require the index to be pre-built via `python backend/RAG/indexer.py`.
+6. **Single LLM thread:** Throughput is bottlenecked by Ollama's sequential inference. Concurrent tests measure queueing behavior, not true parallel inference.
+
+---
+
+## Changes from Assignment 4
+
+No changes were made to the core chatbot system. The evaluation suite is a pure addition:
+- All test files are in `tests/`
+- Runner script at `run_evals.py`
+- Results output to `eval_results/`
+- Dependencies added: `pytest`, `pytest-asyncio`, `websockets`
+
+---
+
+## Video Demo
+
+**[YouTube Link]** — *(Upload your 5-minute demo as unlisted and paste the link here)*
+
+The video demonstrates:
+1. Running the automated evaluation suite
+2. Key results from component tests
+3. Performance latency measurements
+4. One interesting finding: [describe your finding]
