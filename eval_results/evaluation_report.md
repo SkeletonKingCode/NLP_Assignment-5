@@ -102,7 +102,7 @@
 
 ## 8. Test Failures and Errors
 
-See detailed results in `eval_results/junit_results.xml`
+See detailed results in [junit_results](./junit_results.xml)
 
 ## 9. Analysis and Insights
 

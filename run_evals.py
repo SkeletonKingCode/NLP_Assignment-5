@@ -405,7 +405,7 @@ def generate_report():
     report_lines.append("")
     junit_path = RESULTS_DIR / "junit_results.xml"
     if junit_path.exists():
-        report_lines.append(f"See detailed results in `eval_results/junit_results.xml`")
+        report_lines.append(f"See detailed results in [junit_results](./junit_results.xml)")
     else:
         report_lines.append("*(No test run data available yet)*")
     report_lines.append("")
