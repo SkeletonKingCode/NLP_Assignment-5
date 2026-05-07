@@ -1,6 +1,6 @@
 # Ali Real Estate Chatbot — Evaluation Report
 
-**Generated:** 2026-05-07 21:21:38
+**Generated:** 2026-05-07 21:40:27
 **Platform:** Linux-6.17.0-23-generic-x86_64-with-glibc2.39
 
 ## 1. Hardware Configuration
@@ -122,9 +122,9 @@
 
 | Scenario | Trials | TTFT Mean | TTFT Median | TTFT P90 | E2E Mean | E2E Median | E2E P90 |
 |----------|--------|-----------|-------------|----------|----------|------------|---------|
-| Simple Dialogue | 30 | 2.551s | 1.940s | 2.363s | 7.055s | 5.940s | 12.707s |
-| RAG Only | 30 | 2.297s | 2.409s | 2.427s | 14.884s | 14.124s | 24.953s |
-| Tool Only | 30 | 2.085s | 2.080s | 2.111s | 12.608s | 10.377s | 21.417s |
+| Simple Dialogue | 9 | 4.831s | 2.066s | 26.222s | 8.342s | 5.757s | 33.069s |
+| RAG Only | 9 | 2.380s | 2.508s | 2.603s | 17.079s | 18.763s | 25.021s |
+| Tool Only | 9 | 4.052s | 2.188s | 11.728s | 14.071s | 13.234s | 22.120s |
 | Mixed (RAG + Tool) | 30 | 2.315s | 2.418s | 2.448s | 17.051s | 16.502s | 29.646s |
 
 ## 8. Performance — Throughput

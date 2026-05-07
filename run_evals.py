@@ -474,8 +474,8 @@ def generate_report():
         report_lines.append(f"- **Thresholds:** TTFT < {tp_data['thresholds']['max_ttft_seconds']}s, E2E < {tp_data['thresholds']['max_e2e_seconds']}s")
         report_lines.append("")
 
-        report_lines.append("| Users | Turns | Time (s) | Turns/sec | Errors | Med TTFT | Med E2E | Within |")
-        report_lines.append("|-------|-------|----------|-----------|--------|----------|---------|--------|")
+        report_lines.append("| Users | Turns | Time (s) | Turns/sec | Errors | Med TTFT | Med E2E |")
+        report_lines.append("|-------|-------|----------|-----------|--------|----------|---------|")
         for level in tp_data.get("levels", []):
             ttft_med = level["ttft"].get("median")
             e2e_med = level["e2e"].get("median")
