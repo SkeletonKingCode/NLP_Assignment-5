@@ -1,6 +1,6 @@
 # Ali Real Estate Chatbot — Evaluation Report
 
-**Generated:** 2026-05-07 21:40:27
+**Generated:** 2026-05-07 21:51:03
 **Platform:** Linux-6.17.0-23-generic-x86_64-with-glibc2.39
 
 ## 1. Hardware Configuration
@@ -133,8 +133,8 @@
 - **Breakpoint:** 1 users
 - **Thresholds:** TTFT < 2.0s, E2E < 10.0s
 
-| Users | Turns | Time (s) | Turns/sec | Errors | Med TTFT | Med E2E | Within |
-|-------|-------|----------|-----------|--------|----------|---------|--------|
+| Users | Turns | Time (s) | Turns/sec | Errors | Med TTFT | Med E2E |
+|-------|-------|----------|-----------|--------|----------|---------|
 | 1 | 3 | 30.5 | 0.10 | 0 || 3.136s | 11.657s |
 | 2 | 6 | 71.4 | 0.08 | 0 || 11.968s | 19.125s |
 | 3 | 9 | 125.1 | 0.07 | 0 || 19.242s | 27.125s |
