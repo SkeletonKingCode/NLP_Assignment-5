@@ -231,11 +231,17 @@ class TestThroughputConcurrency:
         - Maximum sustainable concurrency
         - Breakpoint where latency degrades
         """
+        # ----- WARM-UP PHASE -----
+        print("\n🔥 Warming up server (1 user, 2 iterations)...")
+        for _ in range(2):
+            await _run_concurrency_level(WS_URL, 1, USER_MESSAGES)
+        print("Warm-up complete.\n")
+
         all_results = []
         max_sustainable = 0
         breakpoint_level = None
 
-        print(f"\n{'='*70}")
+        print(f"{'='*70}")
         print("THROUGHPUT / CONCURRENCY EVALUATION")
         print(f"Thresholds: TTFT < {MAX_TTFT_SECONDS}s, E2E < {MAX_E2E_SECONDS}s")
         print(f"{'='*70}")
@@ -290,5 +296,4 @@ class TestThroughputConcurrency:
                 "levels": all_results,
             }, f, indent=2)
 
-        # The test always passes; it's a measurement
         assert len(all_results) > 0

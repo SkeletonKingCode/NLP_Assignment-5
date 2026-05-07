@@ -1,6 +1,6 @@
 # Ali Real Estate Chatbot — Evaluation Report
 
-**Generated:** 2026-05-05 01:03:57
+**Generated:** 2026-05-07 21:21:38
 **Platform:** Linux-6.17.0-23-generic-x86_64-with-glibc2.39
 
 ## 1. Hardware Configuration
@@ -11,8 +11,8 @@
 | CPU Cores | 8 |
 | RAM | 31.2 GB |
 | GPU | NVIDIA GeForce GTX 1050 (4096 MiB, driver 580.142) |
-| Disk (Used/Total) | 80.5/467.3 GB |
-| Disk (Free/Total) | 386.8/467.3 GB |
+| Disk (Used/Total) | 81.30000000000001/467.3 GB |
+| Disk (Free/Total) | 386.0/467.3 GB |
 | Python | 3.11.14 |
 
 ## 2. Dependency Versions
@@ -28,31 +28,73 @@
 | websockets | 16.0 |
 | ollama | installed |
 
-## 3. Component-Level Correctness
+## 3. Unit & Component Test Results
 
-### 3.1 Calculator Tool
+| Test Module / Class | Total | Passed | Failed | Errors | Skipped |
+|---------------------|-------|--------|--------|--------|---------|
+| tests.test_api::TestHealthEndpoint | 4 | 4 | 0 | 0 | 0 |
+| tests.test_api::TestRootEndpoint | 2 | 2 | 0 | 0 | 0 |
+| tests.test_api::TestSessionEndpoints | 7 | 7 | 0 | 0 | 0 |
+| tests.test_api::TestSynthEndpoint | 2 | 1 | 1 | 0 | 0 |
+| tests.test_calculator::TestCalculatorErrors | 8 | 8 | 0 | 0 | 0 |
+| tests.test_calculator::TestCalculatorFunctional | 10 | 10 | 0 | 0 | 0 |
+| tests.test_calculator::TestEvaluateExpression | 5 | 5 | 0 | 0 | 0 |
+| tests.test_calendar::TestCalendarCRUD | 7 | 7 | 0 | 0 | 0 |
+| tests.test_calendar::TestCalendarEdgeCases | 4 | 4 | 0 | 0 | 0 |
+| tests.test_conversation::TestContextWindow | 5 | 5 | 0 | 0 | 0 |
+| tests.test_conversation::TestInventory | 6 | 6 | 0 | 0 | 0 |
+| tests.test_conversation::TestSessionCRUD | 8 | 8 | 0 | 0 | 0 |
+| tests.test_conversation::TestStageAdvancement | 13 | 13 | 0 | 0 | 0 |
+| tests.test_conversation::TestSystemPrompt | 8 | 8 | 0 | 0 | 0 |
+| tests.test_conversational_correctness::TestDeterministicStageTransitions | 4 | 4 | 0 | 0 | 0 |
+| tests.test_crm::TestCRMAsync | 3 | 3 | 0 | 0 | 0 |
+| tests.test_crm::TestCRMCrud | 6 | 6 | 0 | 0 | 0 |
+| tests.test_crm::TestCRMDataTypes | 4 | 4 | 0 | 0 | 0 |
+| tests.test_crm::TestCRMPersistence | 2 | 2 | 0 | 0 | 0 |
+| tests.test_orchestrator::TestToolCaching | 2 | 2 | 0 | 0 | 0 |
+| tests.test_orchestrator::TestToolCallParsing | 9 | 9 | 0 | 0 | 0 |
+| tests.test_orchestrator::TestToolExecution | 5 | 5 | 0 | 0 | 0 |
+| tests.test_orchestrator::TestToolRegistration | 3 | 3 | 0 | 0 | 0 |
+| tests.test_rag::TestRAGContextRelevance | 1 | 1 | 0 | 0 | 0 |
+| tests.test_rag::TestRAGFaithfulness | 1 | 1 | 0 | 0 | 0 |
+| tests.test_rag::TestRAGRetrievalMetrics | 3 | 3 | 0 | 0 | 0 |
+| tests.test_rag::TestSemanticMatch | 3 | 3 | 0 | 0 | 0 |
+| tests.test_weather::TestWeatherFunctional | 4 | 4 | 0 | 0 | 0 |
+| tests.test_weather::TestWeatherReturnType | 2 | 2 | 0 | 0 | 0 |
+| tests.test_weather::TestWeatherSyncErrors | 4 | 4 | 0 | 0 | 0 |
+
+**Summary:** 144 passed, 1 failed, 0 errors, 0 skipped out of 145 total tests.
+
+### Test Failures
+
+- `tests.test_api.TestSynthEndpoint.test_synth_tts_unavailable`: assert 500 == 503
+ +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+## 4. Component-Level Correctness (Narrative)
+
+### 4.1 Calculator Tool
 - **Functional tests:** Arithmetic operations, error handling, code injection prevention
 - **Edge cases:** Division by zero, large exponents, empty input, special characters
 
-### 3.2 Weather Tool
+### 4.2 Weather Tool
 - **Functional tests:** Valid/invalid cities, mocked HTTP responses
 - **Error handling:** Timeouts, network errors, unknown locations
 
-### 3.3 Calendar Tool
+### 4.3 Calendar Tool
 - **CRUD tests:** Add/retrieve events, date filtering, ordering
 - **Edge cases:** Missing descriptions, kwargs fallback, empty results
 
-### 3.4 CRM Tool
+### 4.4 CRM Tool
 - **CRUD tests:** Create, read, update user records
 - **Persistence:** Data survives across operations
 - **Data types:** Numeric, boolean, nested dict, empty data
 
-### 3.5 Tool Orchestrator
+### 4.5 Tool Orchestrator
 - **Registration:** Tool registration and system instructions
 - **JSON Parsing:** Single/multiple tool calls, surrounding text, invalid JSON
 - **Execution:** Valid/invalid tools, argument filtering, caching
 
-## 4. RAG Evaluation
+## 5. RAG Evaluation
 
 | Metric | Score | Queries |
 |--------|-------|---------|
@@ -61,7 +103,7 @@
 | Context Relevance | 0.6333 | 30 |
 | Faithfulness (keyword) | 0.7222 | 30 |
 
-## 5. Overall Conversational Correctness
+## 6. Overall Conversational Correctness
 
 ### Stage Transition Accuracy
 - **Passed:** 11/13 dialogues
@@ -76,7 +118,7 @@
 | Coherence | 0.0000 | 0 |
 | Faithfulness | 0.0000 | 0 |
 
-## 6. Performance — Latency
+## 7. Performance — Latency
 
 | Scenario | Trials | TTFT Mean | TTFT Median | TTFT P90 | E2E Mean | E2E Median | E2E P90 |
 |----------|--------|-----------|-------------|----------|----------|------------|---------|
@@ -85,7 +127,7 @@
 | Tool Only | 30 | 2.085s | 2.080s | 2.111s | 12.608s | 10.377s | 21.417s |
 | Mixed (RAG + Tool) | 30 | 2.315s | 2.418s | 2.448s | 17.051s | 16.502s | 29.646s |
 
-## 7. Performance — Throughput
+## 8. Performance — Throughput
 
 - **Max Sustainable Concurrency:** 0 users
 - **Breakpoint:** 1 users
@@ -93,18 +135,18 @@
 
 | Users | Turns | Time (s) | Turns/sec | Errors | Med TTFT | Med E2E | Within |
 |-------|-------|----------|-----------|--------|----------|---------|--------|
-| 1 | 3 | 30.5 | 0.10 | 0 | 3.136s | 11.657s | ✗ |
-| 2 | 6 | 71.4 | 0.08 | 0 | 11.968s | 19.125s | ✗ |
-| 3 | 9 | 125.1 | 0.07 | 0 | 19.242s | 27.125s | ✗ |
-| 5 | 15 | 160.8 | 0.09 | 0 | 41.413s | 48.373s | ✗ |
-| 8 | 24 | 260.0 | 0.09 | 0 | 68.626s | 74.021s | ✗ |
-| 10 | 30 | 325.9 | 0.09 | 0 | 79.290s | 83.929s | ✗ |
+| 1 | 3 | 30.5 | 0.10 | 0 || 3.136s | 11.657s |
+| 2 | 6 | 71.4 | 0.08 | 0 || 11.968s | 19.125s |
+| 3 | 9 | 125.1 | 0.07 | 0 || 19.242s | 27.125s |
+| 5 | 15 | 160.8 | 0.09 | 0 || 41.413s | 48.373s |
+| 8 | 24 | 260.0 | 0.09 | 0 || 68.626s | 74.021s |
+| 10 | 30 | 325.9 | 0.09 | 0 || 79.290s | 83.929s |
 
-## 8. Test Failures and Errors
+## 9. Detailed Test Failures
 
-See detailed results in [junit_results](./junit_results.xml)
+See the JUnit XML report for full details: [`junit_results.xml`](./junit_results.xml)
 
-## 9. Analysis and Insights
+## 10. Analysis and Insights
 
 ### Key Findings
 

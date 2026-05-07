@@ -207,7 +207,7 @@ def run_pytest(markers: list, extra_args: list = None) -> dict:
 
 
 def generate_report():
-    """Generate the evaluation report from collected results."""
+    """Generate the evaluation report from collected results, including JUnit test results."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     hw_info = get_hardware_info()
@@ -243,38 +243,131 @@ def generate_report():
         report_lines.append(f"| {pkg} | {ver} |")
     report_lines.append("")
 
-    # Component Tests Results
-    report_lines.append("## 3. Component-Level Correctness")
+    # ------------------------------------------------------------------
+    # NEW: Unit/Component Test Results from JUnit XML
+    # ------------------------------------------------------------------
+    report_lines.append("## 3. Unit & Component Test Results")
     report_lines.append("")
-    report_lines.append("### 3.1 Calculator Tool")
+
+    junit_path = RESULTS_DIR / "junit_results.xml"
+    if junit_path.exists():
+        import xml.etree.ElementTree as ET
+        try:
+            tree = ET.parse(junit_path)
+            root = tree.getroot()
+
+            # Collect statistics per test suite (class)
+            suites = {}
+            for testsuite in root.findall("testsuite"):
+                suite_name = testsuite.get("name", "unknown")
+                # Many pytest runs produce a single testsuite; we can split by class name from test cases
+                # Alternatively, we examine each testcase's classname attribute
+                for testcase in testsuite.findall("testcase"):
+                    classname = testcase.get("classname", "")
+                    # classname is usually like "test_calculator.TestCalculatorFunctional"
+                    # Extract the module and class
+                    if "." in classname:
+                        module_part, class_part = classname.rsplit(".", 1)
+                    else:
+                        module_part = classname
+                        class_part = ""
+
+                    key = f"{module_part}::{class_part}" if class_part else module_part
+                    if key not in suites:
+                        suites[key] = {"total": 0, "passed": 0, "failed": 0, "errors": 0, "skipped": 0}
+
+                    suites[key]["total"] += 1
+                    # Check for failure or error child
+                    failure = testcase.find("failure")
+                    error = testcase.find("error")
+                    skipped = testcase.find("skipped")
+                    if failure is not None:
+                        suites[key]["failed"] += 1
+                    elif error is not None:
+                        suites[key]["errors"] += 1
+                    elif skipped is not None:
+                        suites[key]["skipped"] += 1
+                    else:
+                        suites[key]["passed"] += 1
+
+            # Generate markdown table
+            if suites:
+                report_lines.append("| Test Module / Class | Total | Passed | Failed | Errors | Skipped |")
+                report_lines.append("|---------------------|-------|--------|--------|--------|---------|")
+                for key, stats in sorted(suites.items()):
+                    report_lines.append(
+                        f"| {key} | {stats['total']} | {stats['passed']} | {stats['failed']} | {stats['errors']} | {stats['skipped']} |"
+                    )
+                total_tests = sum(s["total"] for s in suites.values())
+                total_passed = sum(s["passed"] for s in suites.values())
+                total_failed = sum(s["failed"] for s in suites.values())
+                total_errors = sum(s["errors"] for s in suites.values())
+                total_skipped = sum(s["skipped"] for s in suites.values())
+                report_lines.append("")
+                report_lines.append(f"**Summary:** {total_passed} passed, {total_failed} failed, {total_errors} errors, {total_skipped} skipped out of {total_tests} total tests.")
+                report_lines.append("")
+            else:
+                report_lines.append("No test cases found in JUnit XML.")
+                report_lines.append("")
+
+            # List failures if any
+            failures = []
+            for testsuite in root.findall("testsuite"):
+                for testcase in testsuite.findall("testcase"):
+                    failure = testcase.find("failure")
+                    if failure is not None:
+                        test_name = testcase.get("name", "unknown")
+                        classname = testcase.get("classname", "")
+                        message = failure.get("message", "No message")
+                        failures.append(f"- `{classname}.{test_name}`: {message[:200]}")
+            if failures:
+                report_lines.append("### Test Failures")
+                report_lines.append("")
+                report_lines.extend(failures[:10])  # limit to first 10
+                if len(failures) > 10:
+                    report_lines.append(f"... and {len(failures)-10} more failures. See full JUnit XML for details.")
+                report_lines.append("")
+
+        except Exception as e:
+            report_lines.append(f"Error parsing JUnit XML: {e}")
+            report_lines.append("")
+    else:
+        report_lines.append("*(No test run data available yet – run tests to populate)*")
+        report_lines.append("")
+
+    # Continue with existing sections (renumbered)
+    # Component Tests Results (mostly narrative) – keep as is but renumber
+    report_lines.append("## 4. Component-Level Correctness (Narrative)")
+    report_lines.append("")
+    report_lines.append("### 4.1 Calculator Tool")
     report_lines.append("- **Functional tests:** Arithmetic operations, error handling, code injection prevention")
     report_lines.append("- **Edge cases:** Division by zero, large exponents, empty input, special characters")
     report_lines.append("")
 
-    report_lines.append("### 3.2 Weather Tool")
+    report_lines.append("### 4.2 Weather Tool")
     report_lines.append("- **Functional tests:** Valid/invalid cities, mocked HTTP responses")
     report_lines.append("- **Error handling:** Timeouts, network errors, unknown locations")
     report_lines.append("")
 
-    report_lines.append("### 3.3 Calendar Tool")
+    report_lines.append("### 4.3 Calendar Tool")
     report_lines.append("- **CRUD tests:** Add/retrieve events, date filtering, ordering")
     report_lines.append("- **Edge cases:** Missing descriptions, kwargs fallback, empty results")
     report_lines.append("")
 
-    report_lines.append("### 3.4 CRM Tool")
+    report_lines.append("### 4.4 CRM Tool")
     report_lines.append("- **CRUD tests:** Create, read, update user records")
     report_lines.append("- **Persistence:** Data survives across operations")
     report_lines.append("- **Data types:** Numeric, boolean, nested dict, empty data")
     report_lines.append("")
 
-    report_lines.append("### 3.5 Tool Orchestrator")
+    report_lines.append("### 4.5 Tool Orchestrator")
     report_lines.append("- **Registration:** Tool registration and system instructions")
     report_lines.append("- **JSON Parsing:** Single/multiple tool calls, surrounding text, invalid JSON")
     report_lines.append("- **Execution:** Valid/invalid tools, argument filtering, caching")
     report_lines.append("")
 
     # RAG Evaluation
-    report_lines.append("## 4. RAG Evaluation")
+    report_lines.append("## 5. RAG Evaluation")
     report_lines.append("")
 
     rag_metrics_map = [
@@ -298,9 +391,8 @@ def generate_report():
             report_lines.append(f"| {metric_name} | *(run test_rag.py)* | — |")
     report_lines.append("")
 
-
     # Conversational Correctness
-    report_lines.append("## 5. Overall Conversational Correctness")
+    report_lines.append("## 6. Overall Conversational Correctness")
     report_lines.append("")
 
     stage_results_path = RESULTS_DIR / "stage_transition_results.json"
@@ -340,7 +432,7 @@ def generate_report():
     report_lines.append("")
 
     # Performance Results
-    report_lines.append("## 6. Performance — Latency")
+    report_lines.append("## 7. Performance — Latency")
     report_lines.append("")
 
     scenarios = [
@@ -370,7 +462,7 @@ def generate_report():
     report_lines.append("")
 
     # Throughput Results
-    report_lines.append("## 7. Performance — Throughput")
+    report_lines.append("## 8. Performance — Throughput")
     report_lines.append("")
 
     throughput_path = RESULTS_DIR / "throughput_results.json"
@@ -393,25 +485,24 @@ def generate_report():
             report_lines.append(
                 f"| {level['num_users']} | {level['total_turns']} "
                 f"| {level['total_time']:.1f} | {level['turns_per_second']:.2f} "
-                f"| {level['errors']} "
-                f"| {ttft_str} | {e2e_str} | {within_str} |"
+                f"| {level['errors']} |"
+                f"| {ttft_str} | {e2e_str} |"
             )
     else:
         report_lines.append("*(Run throughput tests to populate)*")
     report_lines.append("")
 
-    # Test Failures
-    report_lines.append("## 8. Test Failures and Errors")
+    # Test Failures (duplicate? The JUnit section already covers failures, so we keep this as reference)
+    report_lines.append("## 9. Detailed Test Failures")
     report_lines.append("")
-    junit_path = RESULTS_DIR / "junit_results.xml"
     if junit_path.exists():
-        report_lines.append(f"See detailed results in [junit_results](./junit_results.xml)")
+        report_lines.append(f"See the JUnit XML report for full details: [`junit_results.xml`](./junit_results.xml)")
     else:
         report_lines.append("*(No test run data available yet)*")
     report_lines.append("")
 
     # Analysis
-    report_lines.append("## 9. Analysis and Insights")
+    report_lines.append("## 10. Analysis and Insights")
     report_lines.append("")
     report_lines.append("### Key Findings")
     report_lines.append("")
